@@ -1,15 +1,12 @@
 import json
 import pandas as pd
-from sqlalchemy import create_engine
 
-engine = create_engine('sqlite:///df_location.db', echo=False)
-
-with open(r"kfc_locations.json", 'r', encoding='utf8') as read_file:
+with open("kfc_locations.json", 'r', encoding='utf8') as read_file:
     data = json.load(read_file)
 
-df_locations = pd.DataFrame(columns=['INDEX', 'CITY', 'ADDRESS', 'LAT_COORD', 'LONG_COORD', 'STL', 'ETL', 'TF', 'TT'])
-
-features = set()
+df_locations = pd.DataFrame(columns=['Index', 'City', 'Address', 'Lat_coord', 'Long_coord',
+                                     'STL', 'ETL', 'TF', 'TT',
+                                     'BF', 'WW', 'Wifi', 'DI', 'RtC'])
 
 for point in data.get('searchResults'):
     data_row = []
@@ -40,20 +37,17 @@ for point in data.get('searchResults'):
             tf = None
             tt = None
 
-        f = point['storePublic']['features']
-
         for feature in point['storePublic']['features']:
-            features.add(feature)
+            bf = 1 if feature == 'breakfast' else 0
+            ww = 1 if feature == 'walkupWindow' else 0
+            wifi = 1 if feature == 'wifi' else 0
+            di = 1 if feature == 'driveIn' else 0
+            rtc = 1 if feature == '24hours' else 0
 
-        data_row.extend([index, city, address, lat_coord, long_coord, stl, etl, tf, tt])
+        data_row.extend([index, city, address, lat_coord, long_coord,
+                         stl, etl, tf, tt,
+                         bf, ww, wifi, di, rtc])
 
         df_locations.loc[len(df_locations)] = data_row
 
 df_locations.to_csv('df_location', index=False)
-
-# df_locations.to_sql(name='df_location', con=engine, index=False, if_exists='replace')
-
-print(df_locations)
-
-
-
