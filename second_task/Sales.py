@@ -21,7 +21,3 @@ def sales(file):
             frames.append(df)
 
     return pd.concat(frames, axis=0, ignore_index=True, sort=False)
-
-
-
-
